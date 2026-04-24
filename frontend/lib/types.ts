@@ -20,7 +20,8 @@ export type Amenity =
   | "Kitchen"
   | "Parking"
   | "Security"
-  | "Breakfast";
+  | "Breakfast"
+  | "Rooftop";
 
 export interface Room {
   id: string;
