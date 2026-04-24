@@ -63,7 +63,7 @@ export const hostels: Hostel[] = [
     rating: 4.9,
     reviewCount: 154,
     fromPrice: 55,
-    amenities: ["WiFi", "Breakfast", "Rooftop", "AC"],
+    amenities: ["WiFi", "Breakfast", "Security", "AC"],
     isFeatured: true,
   },
   {
