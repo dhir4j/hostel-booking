@@ -1,0 +1,10 @@
+{
+  "active": true,
+  "started_at": "2026-04-24T20:10:05.231Z",
+  "original_prompt": "/oh-my-claudecode:autopilot refer @hostel-application/project folder and build the landing page and product listing page in the @frontend/ which is a nextjs application",
+  "session_id": "08a462b0-72dd-47cb-9fb4-9e53e003bb0a",
+  "project_path": "/home/dhir4j/Documents/Dhillon/hostel-application",
+  "reinforcement_count": 0,
+  "awaiting_confirmation": true,
+  "last_checked_at": "2026-04-24T20:10:05.231Z"
+}

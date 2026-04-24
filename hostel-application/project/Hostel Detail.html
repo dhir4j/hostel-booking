@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hostel Detail — Sahil Bay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', -apple-system, Helvetica Neue, sans-serif; background: #fff; color: #222; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 99px; }
+    input[type=date]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.25s ease forwards; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.25s ease forwards; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const ACCENT = "#ff385c";
+
+const HOSTELS = [
+  { id:1, name:"Casbah Heritage House", city:"Algiers", wilaya:"Alger", rating:4.92, reviews:218, price:4800, badge:"Guest Favourite", type:"Medina",
+    gradients:["linear-gradient(135deg,#c79081,#dfa579)","linear-gradient(135deg,#d4956a,#e8b49a)","linear-gradient(135deg,#b8816a,#c99080)","linear-gradient(135deg,#e0a080,#f0c0a0)","linear-gradient(135deg,#a87060,#c09080)"],
+    tag:"🕌", desc:"Nestled in the heart of the UNESCO-listed Casbah, this beautifully restored Ottoman house offers an authentic Algerian experience. Original arabesque tilework, cedar-wood ceilings, and a central fountain courtyard transport you to another century — yet you're steps from modern Algiers.",
+    highlights:["UNESCO World Heritage location","Restored 18th-century Ottoman architecture","Traditional Moorish courtyard with fountain","5 min walk to the sea and Martyrs Square"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🍳",label:"Breakfast Included"},{icon:"🏠",label:"Rooftop Terrace"},{icon:"❄️",label:"Air Conditioning"},{icon:"🔒",label:"Secure Lockers"},{icon:"🧺",label:"Laundry Service"},{icon:"📚",label:"Reading Room"},{icon:"🚿",label:"Hot Showers"},{icon:"🎒",label:"Luggage Storage"},{icon:"🗺️",label:"City Tours"}],
+    rooms:[
+      {id:"dorm6",name:"6-Bed Mixed Dorm",capacity:6,price:1800,available:4,perks:["Shared bath","Locker","Reading light"]},
+      {id:"dorm4",name:"4-Bed Female Dorm",capacity:4,price:2200,available:2,perks:["Shared bath","Locker","Fan"]},
+      {id:"private",name:"Private Double Room",capacity:2,price:4800,available:1,perks:["Ensuite bath","A/C","City view"]},
+      {id:"suite",name:"Heritage Suite",capacity:2,price:7200,available:1,perks:["Courtyard view","Ensuite","Breakfast","A/C"]},
+    ],
+    reviews_list:[
+      {name:"Yasmine B.",country:"🇫🇷",date:"March 2026",rating:5,text:"Absolutely stunning place. The courtyard at sunset is pure magic. Staff were incredibly helpful with recommendations."},
+      {name:"Karim L.",country:"🇩🇿",date:"February 2026",rating:5,text:"Best hostel I've stayed in across North Africa. The breakfast alone is worth it — fresh bread, honey, olive oil."},
+      {name:"Sofia M.",country:"🇮🇹",date:"January 2026",rating:4,text:"Beautiful architecture and great location. Slightly noisy at night but totally worth it for the experience."},
+      {name:"Tom H.",country:"🇬🇧",date:"December 2025",rating:5,text:"The Heritage Suite was exceptional value. Felt like staying in a museum but incredibly comfortable."},
+    ],
+    lat:36.787, lng:3.059, address:"12 Rue de la Casbah, Alger Centre, Algiers",
+    policies:["Check-in: 14:00 — 23:00","Check-out: 11:00","No smoking indoors","Quiet hours: 22:00 — 08:00","Pets not allowed","Free cancellation up to 48h before check-in"],
+  },
+  { id:2, name:"Tamanrasset Desert Lodge", city:"Tamanrasset", wilaya:"Tamanrasset", rating:4.87, reviews:143, price:6500, badge:"Popular", type:"Saharan",
+    gradients:["linear-gradient(135deg,#f7971e,#ffd200)","linear-gradient(135deg,#e8821a,#f0c000)","linear-gradient(135deg,#f0a030,#ffdc40)","linear-gradient(135deg,#d07010,#d0a838)","linear-gradient(135deg,#fca020,#ffd060)"],
+    tag:"🏜️", desc:"A rustic lodge at the gateway to the Sahara, offering guided desert excursions and stunning Hoggar mountain views. Sleep under a billion stars and wake to silence broken only by wind across ancient volcanic rock formations.",
+    highlights:["Gateway to the Hoggar Mountains","Guided camel treks available","Stargazing platform","Traditional Tuareg cuisine nightly"],
+    amenities:[{icon:"📶",label:"WiFi (limited)"},{icon:"🍽️",label:"Meals Included"},{icon:"🐪",label:"Camel Treks"},{icon:"⛺",label:"Desert Camp"},{icon:"🔭",label:"Stargazing"},{icon:"🌡️",label:"Desert A/C"},{icon:"🚿",label:"Solar Showers"},{icon:"🎒",label:"Luggage Storage"},{icon:"🗺️",label:"Desert Tours"},{icon:"📸",label:"Photography Tours"}],
+    rooms:[
+      {id:"tent4",name:"4-Bed Shared Tent",capacity:4,price:2500,available:6,perks:["Shared facilities","Fan","Meals"]},
+      {id:"bungalow",name:"Private Desert Bungalow",capacity:2,price:6500,available:3,perks:["Ensuite","A/C","Meals","Sunrise view"]},
+      {id:"luxury",name:"Luxury Desert Suite",capacity:2,price:9800,available:1,perks:["Private terrace","Meals","Camel trek","A/C"]},
+    ],
+    reviews_list:[
+      {name:"Amira S.",country:"🇩🇿",date:"April 2026",rating:5,text:"A life-changing experience. The silence of the Sahara at night, the stars — I will return."},
+      {name:"Marc D.",country:"🇫🇷",date:"March 2026",rating:5,text:"The staff organised an incredible overnight camel trek. Absolutely unforgettable."},
+      {name:"Lena K.",country:"🇩🇪",date:"February 2026",rating:4,text:"Very remote but that's the point! Bring cash — no ATMs for 200km."},
+    ],
+    lat:22.785, lng:5.523, address:"Route de l'Assekrem, Tamanrasset",
+    policies:["Check-in: 15:00 — 21:00","Check-out: 10:00","Cash only (no card)","Bring warm clothes for nights","Minimum stay: 2 nights","Free cancellation up to 72h before check-in"],
+  },
+  { id:3, name:"Oran Méditerranée Stay", city:"Oran", wilaya:"Oran", rating:4.78, reviews:312, price:5200, badge:null, type:"Coastal",
+    gradients:["linear-gradient(135deg,#2980b9,#6dd5fa)","linear-gradient(135deg,#1a6fa0,#50c5f0)","linear-gradient(135deg,#3090c9,#7de5ff)","linear-gradient(135deg,#206090,#5dc5ea)","linear-gradient(135deg,#1070a0,#60d0f5)"],
+    tag:"🌊", desc:"Modern coastal hostel overlooking the Mediterranean, minutes from the iconic Santa Cruz fortress and vibrant port city life. Oran's music, its legendary raï scene, and its art deco architecture await just outside the door.",
+    highlights:["Mediterranean sea views","Walking distance to Santa Cruz fortress","Heart of Oran's cultural district","Rooftop pool terrace"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🏊",label:"Rooftop Pool"},{icon:"🌊",label:"Sea View"},{icon:"🍸",label:"Bar & Lounge"},{icon:"❄️",label:"Air Conditioning"},{icon:"🅿️",label:"Free Parking"},{icon:"🔒",label:"Secure Lockers"},{icon:"🧺",label:"Laundry"},{icon:"🚿",label:"Hot Showers"},{icon:"🎵",label:"Live Music Nights"}],
+    rooms:[
+      {id:"dorm8",name:"8-Bed Ocean Dorm",capacity:8,price:1600,available:5,perks:["Sea view","Shared bath","Fan"]},
+      {id:"dorm4",name:"4-Bed Mixed Dorm",capacity:4,price:2400,available:3,perks:["Shared bath","Locker","A/C"]},
+      {id:"private",name:"Private Sea View Room",capacity:2,price:5200,available:2,perks:["Ensuite","Sea view","A/C","Breakfast"]},
+    ],
+    reviews_list:[
+      {name:"Rania M.",country:"🇩🇿",date:"April 2026",rating:5,text:"The rooftop pool with Mediterranean views is stunning. Oran is incredible and this is the best base."},
+      {name:"Pierre L.",country:"🇫🇷",date:"March 2026",rating:4,text:"Very social atmosphere. Met amazing people from all over. Bar on the roof is a great spot."},
+    ],
+    lat:35.698, lng:-0.634, address:"Boulevard de la Soummam, Oran",
+    policies:["Check-in: 14:00 — 00:00","Check-out: 11:00","No smoking in rooms","Pool open 08:00 — 22:00","Pets not allowed","Free cancellation up to 48h before check-in"],
+  },
+  { id:4, name:"Constantine Viaduct View", city:"Constantine", wilaya:"Constantine", rating:4.95, reviews:87, price:4200, badge:"Top Rated", type:"Historical",
+    gradients:["linear-gradient(135deg,#654ea3,#eaafc8)","linear-gradient(135deg,#5540a0,#daa0c0)","linear-gradient(135deg,#7560b0,#f0b8d0)","linear-gradient(135deg,#4535a0,#ca90b8)","linear-gradient(135deg,#6550a8,#e8a8c5)"],
+    tag:"🌉", desc:"Perched above the dramatic ravines of Constantine, the city of bridges. Wake up to breathtaking gorge and suspension bridge views from this beautifully located guesthouse in the historic city centre.",
+    highlights:["Panoramic gorge views","Walking distance to all bridges","Historic city centre","Traditional Constantinian cuisine"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🍳",label:"Breakfast"},{icon:"🌆",label:"Gorge View"},{icon:"🗺️",label:"City Tours"},{icon:"❄️",label:"Air Conditioning"},{icon:"🔒",label:"Secure Lockers"},{icon:"🚿",label:"Hot Showers"},{icon:"🎒",label:"Luggage Storage"}],
+    rooms:[
+      {id:"dorm4",name:"4-Bed Shared Dorm",capacity:4,price:1600,available:4,perks:["Shared bath","Locker","Fan"]},
+      {id:"private",name:"Private Bridge View Room",capacity:2,price:4200,available:2,perks:["Ensuite","Bridge view","A/C","Breakfast"]},
+    ],
+    reviews_list:[
+      {name:"Nadia H.",country:"🇩🇿",date:"April 2026",rating:5,text:"Constantine is the most dramatic city I've ever visited. This hostel made it perfect — the gorge view from breakfast is unforgettable."},
+      {name:"Joel F.",country:"🇧🇪",date:"March 2026",rating:5,text:"Stunning location. The bridges at sunset are breathtaking. Highly recommend the city walking tour."},
+    ],
+    lat:36.365, lng:6.615, address:"Rue Ben M'hidi, Constantine",
+    policies:["Check-in: 14:00 — 22:00","Check-out: 11:00","No smoking","Quiet hours 23:00","Free cancellation up to 48h before check-in"],
+  },
+  { id:5, name:"Tlemcen Atlas Retreat", city:"Tlemcen", wilaya:"Tlemcen", rating:4.81, reviews:196, price:3800, badge:null, type:"Atlas",
+    gradients:["linear-gradient(135deg,#56ab2f,#a8e063)","linear-gradient(135deg,#48a020,#98d050)","linear-gradient(135deg,#60b838,#b0e870)","linear-gradient(135deg,#40a020,#90d040)","linear-gradient(135deg,#58b030,#a8e060)"],
+    tag:"⛰️", desc:"A serene mountain retreat in the Tell Atlas foothills, surrounded by cedar forests and ancient Zianid ruins. The perfect base for hiking and exploring Tlemcen's extraordinary Andalusian heritage.",
+    highlights:["Tell Atlas mountain setting","Access to cedar forests","Near Grand Mosque of Tlemcen","Hiking trails from the door"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🌿",label:"Garden"},{icon:"🥾",label:"Hiking Trails"},{icon:"🍽️",label:"Meals Available"},{icon:"❄️",label:"Heating"},{icon:"🚿",label:"Hot Showers"},{icon:"🔒",label:"Secure Lockers"},{icon:"🎒",label:"Luggage Storage"}],
+    rooms:[
+      {id:"dorm4",name:"4-Bed Forest Dorm",capacity:4,price:1400,available:6,perks:["Shared bath","Locker","Mountain view"]},
+      {id:"private",name:"Private Forest Room",capacity:2,price:3800,available:2,perks:["Ensuite","Garden view","Heating"]},
+    ],
+    reviews_list:[
+      {name:"Farouk B.",country:"🇩🇿",date:"March 2026",rating:5,text:"The cedar forest walks were incredible. Very peaceful and the food was delicious."},
+    ],
+    lat:34.888, lng:-1.315, address:"Route des Cascades, Tlemcen",
+    policies:["Check-in: 14:00 — 21:00","Check-out: 11:00","Hiking boots recommended","No smoking","Free cancellation up to 48h before check-in"],
+  },
+  { id:6, name:"Annaba Corniche Hostel", city:"Annaba", wilaya:"Annaba", rating:4.74, reviews:264, price:4600, badge:null, type:"Coastal",
+    gradients:["linear-gradient(135deg,#1d976c,#93f9b9)","linear-gradient(135deg,#188060,#80eca8)","linear-gradient(135deg,#22a878,#9affc0)","linear-gradient(135deg,#15706a,#80e8a8)","linear-gradient(135deg,#20906c,#8ff8b5)"],
+    tag:"🌴", desc:"Relaxed coastal hostel on the Annaba corniche, close to the Hippo Regius Roman ruins and beautiful Seraïdi forest. A perfect mix of beach, history, and nature.",
+    highlights:["Beachfront location","Near Hippo Regius Roman ruins","Seraïdi forest day trips","Fresh seafood restaurants nearby"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🏖️",label:"Beach Access"},{icon:"🌅",label:"Sea Terrace"},{icon:"❄️",label:"Air Conditioning"},{icon:"🅿️",label:"Parking"},{icon:"🚿",label:"Hot Showers"},{icon:"🔒",label:"Secure Lockers"},{icon:"🍽️",label:"Restaurant"}],
+    rooms:[
+      {id:"dorm6",name:"6-Bed Sea Dorm",capacity:6,price:1500,available:5,perks:["Shared bath","Sea breeze","Fan"]},
+      {id:"private",name:"Private Corniche Room",capacity:2,price:4600,available:3,perks:["Ensuite","Corniche view","A/C"]},
+    ],
+    reviews_list:[
+      {name:"Leila K.",country:"🇩🇿",date:"April 2026",rating:5,text:"Perfect location right on the corniche. Walked to the Roman ruins in 20 minutes. Great value."},
+    ],
+    lat:36.897, lng:7.765, address:"Boulevard du 1er Novembre, Annaba",
+    policies:["Check-in: 14:00 — 23:00","Check-out: 11:00","No smoking","Free cancellation up to 48h before check-in"],
+  },
+  { id:7, name:"Ghardaïa Mozabite Inn", city:"Ghardaïa", wilaya:"Ghardaïa", rating:4.89, reviews:101, price:5500, badge:"Unique Stay", type:"Saharan",
+    gradients:["linear-gradient(135deg,#f2994a,#f2c94c)","linear-gradient(135deg,#e28040,#e2b840)","linear-gradient(135deg,#f0a050,#f0cc50)","linear-gradient(135deg,#d07030,#d0a838)","linear-gradient(135deg,#f09840,#f0c048)"],
+    tag:"🏺", desc:"Stay in a traditional Mozabite-style guesthouse in the M'Zab Valley, a UNESCO World Heritage Site of extraordinary beauty. The five ksour of Ghardaïa are unlike anywhere else on earth.",
+    highlights:["UNESCO M'Zab Valley","Traditional Mozabite architecture","Guided ksar walking tours","Famous local carpet market"],
+    amenities:[{icon:"📶",label:"WiFi"},{icon:"🏺",label:"Guided Tours"},{icon:"🍽️",label:"Local Cuisine"},{icon:"🌿",label:"Courtyard"},{icon:"❄️",label:"A/C"},{icon:"🛒",label:"Market Access"},{icon:"🚿",label:"Hot Showers"},{icon:"🎒",label:"Luggage Storage"}],
+    rooms:[
+      {id:"dorm4",name:"4-Bed Courtyard Dorm",capacity:4,price:2000,available:4,perks:["Shared bath","Courtyard access","Fan"]},
+      {id:"private",name:"Private Mozabite Room",capacity:2,price:5500,available:2,perks:["Ensuite","Ksar view","A/C","Breakfast"]},
+    ],
+    reviews_list:[
+      {name:"Ahmed O.",country:"🇩🇿",date:"March 2026",rating:5,text:"Ghardaïa is one of Algeria's greatest treasures. The inn perfectly captures the Mozabite spirit."},
+    ],
+    lat:32.491, lng:3.673, address:"Ksar Beni Isguen, Ghardaïa",
+    policies:["Check-in: 14:00 — 21:00","Check-out: 11:00","Dress modestly (conservative area)","No alcohol served","Free cancellation up to 72h before check-in"],
+  },
+  { id:8, name:"Béjaïa Kabyle House", city:"Béjaïa", wilaya:"Béjaïa", rating:4.96, reviews:54, price:4400, badge:"New", type:"Coastal",
+    gradients:["linear-gradient(135deg,#43cea2,#185a9d)","linear-gradient(135deg,#38be90,#1050a0)","linear-gradient(135deg,#48deb2,#2060aa)","linear-gradient(135deg,#35b090,#0e4898)","linear-gradient(135deg,#40c8a0,#1858a0)"],
+    tag:"🏔️", desc:"Where the Kabyle mountains meet the Mediterranean. This charming guesthouse in Béjaïa offers the best of both worlds — dramatic mountain scenery and beautiful Mediterranean coves just minutes away.",
+    highlights:["Kabyle mountain backdrop","Access to Mediterranean coves","Near Cap Carbon lighthouse","Traditional Kabyle hospitality"],
+    amenities:[{icon:"📶",label:"Free WiFi"},{icon:"🏔️",label:"Mountain View"},{icon:"🌊",label:"Sea View"},{icon:"🍳",label:"Breakfast"},{icon:"🌿",label:"Garden Terrace"},{icon:"🚿",label:"Hot Showers"},{icon:"❄️",label:"A/C"},{icon:"🔒",label:"Secure Lockers"}],
+    rooms:[
+      {id:"dorm4",name:"4-Bed Mountain Dorm",capacity:4,price:1600,available:3,perks:["Shared bath","Mountain view","Fan"]},
+      {id:"private",name:"Private Sea & Mountain Room",capacity:2,price:4400,available:2,perks:["Ensuite","Dual view","A/C","Breakfast"]},
+    ],
+    reviews_list:[
+      {name:"Lynda A.",country:"🇩🇿",date:"April 2026",rating:5,text:"The view from the terrace — mountains on one side, sea on the other — is simply breathtaking."},
+    ],
+    lat:36.752, lng:5.084, address:"Rue des Oliviers, Béjaïa",
+    policies:["Check-in: 14:00 — 22:00","Check-out: 11:00","No smoking","Free cancellation up to 48h before check-in"],
+  },
+];
+
+function getParam(k) { return new URLSearchParams(window.location.search).get(k); }
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+function Logo() {
+  return (
+    <a href="Landing Page.html" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="10" fill={ACCENT}/>
+        <path d="M20 8C14 8 10 13 10 18C10 24 16 30 20 33C24 30 30 24 30 18C30 13 26 8 20 8Z" fill="white" opacity="0.9"/>
+        <circle cx="20" cy="18" r="4" fill={ACCENT}/>
+      </svg>
+      <span style={{fontSize:18,fontWeight:800,color:ACCENT,letterSpacing:"-0.5px"}}>Sahil Bay</span>
+    </a>
+  );
+}
+
+function StarRow({ rating, size=13 }) {
+  return (
+    <span style={{display:"inline-flex",gap:2,verticalAlign:"middle"}}>
+      {[1,2,3,4,5].map(i => (
+        <svg key={i} width={size} height={size} viewBox="0 0 24 24" fill={i <= Math.round(rating) ? "#222" : "#ddd"}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+// ── Gallery ───────────────────────────────────────────────────────────────────
+function Gallery({ hostel }) {
+  const [activeImg, setActiveImg] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+
+  const openLightbox = (idx) => { setActiveImg(idx); setLightbox(true); };
+
+  return (
+    <>
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gridTemplateRows:"260px 130px", gap:8, borderRadius:20, overflow:"hidden"}}>
+        {/* Main */}
+        <div onClick={() => openLightbox(0)} style={{gridRow:"span 2", background:hostel.gradients[0], position:"relative", cursor:"pointer"}}>
+          <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:72,opacity:0.18}}>{hostel.tag}</div>
+          <div style={{position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(45deg,rgba(255,255,255,0.04) 0,rgba(255,255,255,0.04) 1px,transparent 1px,transparent 8px)"}}/>
+          <div style={{position:"absolute",bottom:8,left:"50%",transform:"translateX(-50%)",fontSize:9,color:"rgba(255,255,255,0.35)",fontFamily:"monospace",whiteSpace:"nowrap"}}>main hostel photo</div>
+          <div onClick={e=>{e.stopPropagation();openLightbox(0)}} style={{position:"absolute",bottom:16,right:16,background:"rgba(255,255,255,0.92)",borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,boxShadow:"0 2px 8px rgba(0,0,0,0.12)"}}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            All photos
+          </div>
+        </div>
+        {/* Thumbs */}
+        {hostel.gradients.slice(1,5).map((g,i) => (
+          <div key={i} onClick={() => openLightbox(i+1)} style={{background:g,position:"relative",cursor:"pointer",transition:"opacity 0.15s"}}
+            onMouseEnter={e=>e.currentTarget.style.opacity="0.82"}
+            onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+            <div style={{position:"absolute",inset:0,backgroundImage:"repeating-linear-gradient(45deg,rgba(255,255,255,0.04) 0,rgba(255,255,255,0.04) 1px,transparent 1px,transparent 8px)"}}/>
+            <div style={{position:"absolute",bottom:4,left:"50%",transform:"translateX(-50%)",fontSize:8,color:"rgba(255,255,255,0.3)",fontFamily:"monospace",whiteSpace:"nowrap"}}>photo {i+2}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.93)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center"}} onClick={()=>setLightbox(false)}>
+          <button onClick={()=>setLightbox(false)} style={{position:"absolute",top:20,right:20,background:"rgba(255,255,255,0.12)",border:"none",cursor:"pointer",borderRadius:"50%",width:44,height:44,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          <button onClick={e=>{e.stopPropagation();setActiveImg(a=>(a-1+hostel.gradients.length)%hostel.gradients.length)}} style={{position:"absolute",left:24,background:"rgba(255,255,255,0.14)",border:"none",cursor:"pointer",borderRadius:"50%",width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div onClick={e=>e.stopPropagation()} style={{width:"68vw",maxWidth:880,aspectRatio:"16/10",background:hostel.gradients[activeImg],borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}>
+            <span style={{fontSize:80,opacity:0.2}}>{hostel.tag}</span>
+            <div style={{position:"absolute",bottom:12,left:"50%",transform:"translateX(-50%)",fontSize:11,color:"rgba(255,255,255,0.4)",fontFamily:"monospace"}}>photo {activeImg+1} of {hostel.gradients.length}</div>
+          </div>
+          <button onClick={e=>{e.stopPropagation();setActiveImg(a=>(a+1)%hostel.gradients.length)}} style={{position:"absolute",right:24,background:"rgba(255,255,255,0.14)",border:"none",cursor:"pointer",borderRadius:"50%",width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <div style={{position:"absolute",bottom:24,display:"flex",gap:8}}>
+            {hostel.gradients.map((_,i)=>(
+              <div key={i} onClick={e=>{e.stopPropagation();setActiveImg(i)}} style={{width:i===activeImg?28:8,height:8,borderRadius:4,background:i===activeImg?"#fff":"rgba(255,255,255,0.35)",cursor:"pointer",transition:"width 0.2s"}}/>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── Map ───────────────────────────────────────────────────────────────────────
+function MapPlaceholder({ hostel }) {
+  return (
+    <div style={{borderRadius:16,overflow:"hidden",border:"1px solid #e0e0e0",position:"relative",height:240,background:"linear-gradient(135deg,#e4eff4,#cde0ea)"}}>
+      <svg style={{position:"absolute",inset:0,width:"100%",height:"100%",opacity:0.4}} viewBox="0 0 400 240">
+        {[0,1,2,3].map(i=><line key={"h"+i} x1="0" y1={i*60} x2="400" y2={i*60} stroke="#94b4c0" strokeWidth="0.5"/>)}
+        {[0,1,2,3,4,5,6].map(i=><line key={"v"+i} x1={i*65} y1="0" x2={i*65} y2="240" stroke="#94b4c0" strokeWidth="0.5"/>)}
+        <rect x="55" y="35" width="75" height="28" rx="4" fill="#c8dce8"/>
+        <rect x="175" y="75" width="58" height="38" rx="4" fill="#b8ccd8"/>
+        <rect x="255" y="28" width="88" height="48" rx="4" fill="#c0d4e0"/>
+        <rect x="75" y="135" width="95" height="32" rx="4" fill="#b0c8d4"/>
+        <rect x="215" y="145" width="68" height="42" rx="4" fill="#c8dce8"/>
+        <path d="M0 170 Q100 150 200 165 Q300 180 400 160" stroke="#a0c0d0" strokeWidth="7" fill="none" opacity="0.55"/>
+      </svg>
+      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-65%)",display:"flex",flexDirection:"column",alignItems:"center",zIndex:2}}>
+        <div style={{width:42,height:42,borderRadius:"50%",background:ACCENT,border:"3px solid #fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 14px rgba(0,0,0,0.25)"}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        </div>
+        <div style={{width:2,height:14,background:ACCENT}}/>
+        <div style={{width:8,height:4,borderRadius:"50%",background:"rgba(0,0,0,0.18)"}}/>
+      </div>
+      <div style={{position:"absolute",top:"calc(50% - 74px)",left:"calc(50% + 18px)",background:"#fff",borderRadius:10,padding:"8px 12px",boxShadow:"0 2px 12px rgba(0,0,0,0.14)",fontSize:12,fontWeight:700,color:"#222",whiteSpace:"nowrap",zIndex:3}}>
+        {hostel.name}
+        <div style={{fontSize:11,fontWeight:400,color:"#6a6a6a",marginTop:2}}>{hostel.address}</div>
+      </div>
+      <div style={{position:"absolute",bottom:12,right:12,background:"rgba(255,255,255,0.92)",borderRadius:8,padding:"6px 12px",fontSize:12,fontWeight:600,color:"#222",cursor:"pointer",boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>Open in Maps</div>
+      <div style={{position:"absolute",bottom:12,left:12,fontSize:11,color:"#6a6a6a"}}>{hostel.city}, Algeria</div>
+    </div>
+  );
+}
+
+// ── Booking Panel ─────────────────────────────────────────────────────────────
+function BookingPanel({ hostel }) {
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [checkIn, setCheckIn] = useState(getParam("checkIn") || "");
+  const [checkOut, setCheckOut] = useState(getParam("checkOut") || "");
+  const [guests, setGuests] = useState(parseInt(getParam("guests") || "1"));
+  const [step, setStep] = useState(1);
+  const [liked, setLiked] = useState(false);
+
+  const today = new Date().toISOString().split("T")[0];
+  const nights = (checkIn && checkOut) ? Math.max(0, Math.round((new Date(checkOut)-new Date(checkIn))/(86400000))) : 0;
+  const room = hostel.rooms.find(r => r.id === selectedRoom);
+  const subtotal = room && nights > 0 ? room.price * nights : 0;
+  const serviceFee = Math.round(subtotal * 0.08);
+  const total = subtotal + serviceFee;
+
+  const iBase = {width:"100%",border:"1px solid #e0e0e0",borderRadius:10,padding:"11px 14px",fontSize:14,fontFamily:"inherit",color:"#222",outline:"none",background:"#fff"};
+  const focusRed = e => { e.target.style.borderColor = ACCENT; };
+  const blurGray = e => { e.target.style.borderColor = "#e0e0e0"; };
+
+  if (step === 3) return (
+    <div style={{border:"1px solid #e0e0e0",borderRadius:24,padding:28,boxShadow:"rgba(0,0,0,0.02) 0px 0px 0px 1px,rgba(0,0,0,0.06) 0px 4px 12px",textAlign:"center"}}>
+      <div style={{width:60,height:60,borderRadius:"50%",background:"#f0fff4",border:"2px solid #22c55e",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 style={{fontSize:20,fontWeight:700,color:"#222",marginBottom:8}}>Booking Requested!</h3>
+      <p style={{fontSize:14,color:"#6a6a6a",lineHeight:1.6,marginBottom:20}}>Your request for <strong>{room?.name}</strong> has been sent. The host will confirm within 2 hours.</p>
+      <div style={{background:"#f7f7f7",borderRadius:12,padding:16,textAlign:"left",marginBottom:20}}>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:"#6a6a6a"}}>Check-in</span><span style={{fontWeight:600}}>{checkIn}</span></div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:"#6a6a6a"}}>Check-out</span><span style={{fontWeight:600}}>{checkOut}</span></div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:"#6a6a6a"}}>Guests</span><span style={{fontWeight:600}}>{guests}</span></div>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:14,fontWeight:700,borderTop:"1px solid #e0e0e0",paddingTop:10,marginTop:6}}><span>Total</span><span style={{color:ACCENT}}>{total.toLocaleString()} DA</span></div>
+      </div>
+      <button onClick={()=>{setStep(1);setSelectedRoom(null);}} style={{width:"100%",background:"#f2f2f2",color:"#222",border:"none",borderRadius:10,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>Make another booking</button>
+    </div>
+  );
+
+  if (step === 2 && room) return (
+    <div style={{border:"1px solid #e0e0e0",borderRadius:24,padding:28,boxShadow:"rgba(0,0,0,0.02) 0px 0px 0px 1px,rgba(0,0,0,0.06) 0px 4px 12px"}}>
+      <button onClick={()=>setStep(1)} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",fontSize:14,fontWeight:600,color:"#6a6a6a",marginBottom:16,fontFamily:"inherit"}}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>Back
+      </button>
+      <h3 style={{fontSize:18,fontWeight:700,color:"#222",marginBottom:20}}>Review your booking</h3>
+      <div style={{background:"#f7f7f7",borderRadius:12,padding:14,marginBottom:20,display:"flex",gap:12,alignItems:"center"}}>
+        <div style={{width:52,height:52,borderRadius:10,background:hostel.gradients[0],flexShrink:0}}/>
+        <div>
+          <div style={{fontWeight:700,fontSize:14,color:"#222"}}>{room.name}</div>
+          <div style={{fontSize:13,color:"#6a6a6a"}}>{hostel.name} · {hostel.city}</div>
+        </div>
+      </div>
+      <div style={{marginBottom:20}}>
+        {[
+          [`${room.price.toLocaleString()} DA × ${nights} night${nights!==1?"s":""}`, `${subtotal.toLocaleString()} DA`],
+          ["Service fee (8%)", `${serviceFee.toLocaleString()} DA`],
+        ].map(([l,r],i)=>(
+          <div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:14,marginBottom:8,color:"#222"}}><span>{l}</span><span>{r}</span></div>
+        ))}
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:700,borderTop:"1px solid #e0e0e0",paddingTop:12,marginTop:4}}>
+          <span>Total</span><span style={{color:ACCENT}}>{total.toLocaleString()} DA</span>
+        </div>
+      </div>
+      <div style={{marginBottom:20}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#222",marginBottom:10}}>Guest details</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+          <input placeholder="First name" style={iBase} onFocus={focusRed} onBlur={blurGray}/>
+          <input placeholder="Last name" style={iBase} onFocus={focusRed} onBlur={blurGray}/>
+        </div>
+        <input placeholder="Email address" type="email" style={{...iBase,marginBottom:10}} onFocus={focusRed} onBlur={blurGray}/>
+        <input placeholder="Phone number" type="tel" style={iBase} onFocus={focusRed} onBlur={blurGray}/>
+      </div>
+      <p style={{fontSize:12,color:"#6a6a6a",marginBottom:16,lineHeight:1.5}}>By confirming you agree to the <span style={{color:ACCENT,cursor:"pointer",fontWeight:600}}>cancellation policy</span> and <span style={{color:ACCENT,cursor:"pointer",fontWeight:600}}>house rules</span>.</p>
+      <button onClick={()=>setStep(3)} style={{width:"100%",background:ACCENT,color:"#fff",border:"none",borderRadius:12,padding:"15px",fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"background 0.2s"}}
+        onMouseEnter={e=>e.currentTarget.style.background="#e00b41"} onMouseLeave={e=>e.currentTarget.style.background=ACCENT}>
+        Confirm &amp; Request to Book
+      </button>
+    </div>
+  );
+
+  const canReserve = selectedRoom && checkIn && checkOut && nights > 0;
+
+  return (
+    <div style={{border:"1px solid #e0e0e0",borderRadius:24,padding:28,boxShadow:"rgba(0,0,0,0.02) 0px 0px 0px 1px,rgba(0,0,0,0.06) 0px 4px 12px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:20}}>
+        <div>
+          <span style={{fontSize:22,fontWeight:800,color:"#222"}}>from {hostel.rooms[0].price.toLocaleString()} DA</span>
+          <span style={{fontSize:14,color:"#6a6a6a"}}> / night</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:4,fontSize:14}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#222"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span style={{fontWeight:700}}>{hostel.rating}</span>
+          <span style={{color:"#6a6a6a"}}>({hostel.reviews})</span>
+        </div>
+      </div>
+
+      {/* Dates + guests */}
+      <div style={{border:"1px solid #e0e0e0",borderRadius:12,overflow:"hidden",marginBottom:14}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",borderBottom:"1px solid #e0e0e0"}}>
+          <div style={{padding:"10px 14px",borderRight:"1px solid #e0e0e0"}}>
+            <div style={{fontSize:10,fontWeight:700,letterSpacing:0.5,color:"#222",marginBottom:4}}>CHECK-IN</div>
+            <input type="date" min={today} value={checkIn} onChange={e=>setCheckIn(e.target.value)} style={{border:"none",outline:"none",fontFamily:"inherit",fontSize:13,color:"#222",background:"transparent",width:"100%",cursor:"pointer",colorScheme:"light"}}/>
+          </div>
+          <div style={{padding:"10px 14px"}}>
+            <div style={{fontSize:10,fontWeight:700,letterSpacing:0.5,color:"#222",marginBottom:4}}>CHECK-OUT</div>
+            <input type="date" min={checkIn||today} value={checkOut} onChange={e=>setCheckOut(e.target.value)} style={{border:"none",outline:"none",fontFamily:"inherit",fontSize:13,color:"#222",background:"transparent",width:"100%",cursor:"pointer",colorScheme:"light"}}/>
+          </div>
+        </div>
+        <div style={{padding:"10px 14px"}}>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:0.5,color:"#222",marginBottom:6}}>GUESTS</div>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <button onClick={()=>setGuests(g=>Math.max(1,g-1))} style={{width:26,height:26,borderRadius:"50%",border:"1px solid #ddd",background:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",color:"#222"}}>−</button>
+            <span style={{fontSize:14,fontWeight:600}}>{guests} guest{guests!==1?"s":""}</span>
+            <button onClick={()=>setGuests(g=>g+1)} style={{width:26,height:26,borderRadius:"50%",border:"1px solid #ddd",background:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",color:"#222"}}>+</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Room list */}
+      <div style={{marginBottom:16}}>
+        <div style={{fontSize:13,fontWeight:700,color:"#222",marginBottom:10}}>Select a room</div>
+        {hostel.rooms.map(r => {
+          const sel = selectedRoom === r.id;
+          return (
+            <div key={r.id} onClick={()=>setSelectedRoom(r.id)} style={{border:`2px solid ${sel?ACCENT:"#e0e0e0"}`,borderRadius:12,padding:"12px 14px",marginBottom:8,cursor:"pointer",background:sel?"#fff8f9":"#fff",transition:"border-color 0.15s,background 0.15s"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14,color:"#222"}}>{r.name}</div>
+                  <div style={{fontSize:12,color:"#6a6a6a",marginTop:2}}>Up to {r.capacity} guests · {r.available} left</div>
+                  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:6}}>
+                    {r.perks.map(p=><span key={p} style={{fontSize:11,color:"#6a6a6a",background:"#f2f2f2",padding:"2px 8px",borderRadius:99}}>{p}</span>)}
+                  </div>
+                </div>
+                <div style={{textAlign:"right",flexShrink:0}}>
+                  <div style={{fontSize:15,fontWeight:800,color:"#222"}}>{r.price.toLocaleString()} DA</div>
+                  <div style={{fontSize:11,color:"#6a6a6a"}}>/night</div>
+                </div>
+              </div>
+              {sel && (
+                <div style={{display:"flex",alignItems:"center",gap:4,marginTop:8,color:ACCENT,fontSize:12,fontWeight:600}}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>Selected
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Price breakdown */}
+      {canReserve && (
+        <div className="slide-up" style={{background:"#f7f7f7",borderRadius:12,padding:14,marginBottom:16}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span>{room?.price.toLocaleString()} DA × {nights} night{nights!==1?"s":""}</span><span>{subtotal.toLocaleString()} DA</span></div>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:8}}><span>Service fee</span><span>{serviceFee.toLocaleString()} DA</span></div>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:15,fontWeight:700,borderTop:"1px solid #e0e0e0",paddingTop:10}}><span>Total</span><span style={{color:ACCENT}}>{total.toLocaleString()} DA</span></div>
+        </div>
+      )}
+
+      <button onClick={()=>canReserve&&setStep(2)} style={{width:"100%",background:canReserve?ACCENT:"#e0e0e0",color:canReserve?"#fff":"#999",border:"none",borderRadius:12,padding:"15px",fontSize:16,fontWeight:700,cursor:canReserve?"pointer":"not-allowed",fontFamily:"inherit",transition:"background 0.2s"}}
+        onMouseEnter={e=>{if(canReserve)e.currentTarget.style.background="#e00b41";}}
+        onMouseLeave={e=>{e.currentTarget.style.background=canReserve?ACCENT:"#e0e0e0";}}>
+        {!selectedRoom ? "Select a room" : (!checkIn||!checkOut||nights<=0) ? "Add your dates" : "Reserve"}
+      </button>
+      <p style={{textAlign:"center",fontSize:12,color:"#6a6a6a",marginTop:10}}>You won't be charged yet · Free cancellation</p>
+
+      <button onClick={()=>setLiked(l=>!l)} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",fontSize:13,color:"#222",fontFamily:"inherit",margin:"14px auto 0",padding:0}}>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill={liked?"#ff385c":"none"} stroke={liked?"#ff385c":"#222"} strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        {liked ? "Saved to wishlist" : "Save to wishlist"}
+      </button>
+    </div>
+  );
+}
+
+// ── Main App ──────────────────────────────────────────────────────────────────
+function App() {
+  const id = parseInt(getParam("id") || "1");
+  const hostel = HOSTELS.find(h => h.id === id) || HOSTELS[0];
+  const [tab, setTab] = useState("overview");
+
+  useEffect(() => { document.title = hostel.name + " — Sahil Bay"; }, []);
+
+  const TABS = [
+    {id:"overview", label:"Overview"},
+    {id:"rooms", label:"Rooms"},
+    {id:"amenities", label:"Amenities"},
+    {id:"reviews", label:`Reviews (${hostel.reviews})`},
+    {id:"location", label:"Location"},
+    {id:"policies", label:"Policies"},
+  ];
+
+  const others = HOSTELS.filter(h => h.id !== hostel.id).slice(0, 3);
+
+  return (
+    <div style={{minHeight:"100vh",background:"#fff"}}>
+      {/* Nav */}
+      <nav style={{position:"sticky",top:0,zIndex:500,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(12px)",borderBottom:"1px solid #e8e8e8"}}>
+        <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",height:64,gap:20}}>
+          <Logo/>
+          <div style={{marginLeft:"auto",display:"flex",gap:12,alignItems:"center"}}>
+            <a href="Landing Page.html" style={{display:"flex",alignItems:"center",gap:6,fontSize:13,fontWeight:600,color:"#222",textDecoration:"none",padding:"8px 14px",borderRadius:32,transition:"background 0.15s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#f2f2f2"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              All hostels
+            </a>
+            <button style={{background:ACCENT,border:"none",borderRadius:8,padding:"9px 20px",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",fontFamily:"inherit",transition:"background 0.2s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#e00b41"} onMouseLeave={e=>e.currentTarget.style.background=ACCENT}>
+              Sign in
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div style={{maxWidth:1280,margin:"0 auto",padding:"20px 24px 64px"}}>
+        {/* Breadcrumb */}
+        <div style={{display:"flex",alignItems:"center",gap:6,fontSize:13,color:"#6a6a6a",marginBottom:18}}>
+          <a href="Landing Page.html" style={{color:"#6a6a6a",textDecoration:"underline",cursor:"pointer"}}>Home</a>
+          <span>›</span><span>{hostel.type}</span><span>›</span>
+          <span style={{color:"#222",fontWeight:600}}>{hostel.name}</span>
+        </div>
+
+        {/* Header */}
+        <div style={{marginBottom:20}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:16,flexWrap:"wrap"}}>
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                <span style={{background:"#fff0f2",color:ACCENT,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:32}}>{hostel.type}</span>
+                {hostel.badge && <span style={{background:"#f7f7f7",color:"#222",fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:32}}>{hostel.badge}</span>}
+              </div>
+              <h1 style={{fontSize:"clamp(22px,4vw,34px)",fontWeight:800,color:"#222",letterSpacing:"-0.8px",lineHeight:1.1,marginBottom:10}}>{hostel.name}</h1>
+              <div style={{display:"flex",alignItems:"center",gap:16,flexWrap:"wrap"}}>
+                <div style={{display:"flex",alignItems:"center",gap:6}}>
+                  <StarRow rating={hostel.rating} size={14}/>
+                  <span style={{fontWeight:700,fontSize:14,marginLeft:4}}>{hostel.rating}</span>
+                  <span style={{color:"#6a6a6a",fontSize:13}}>· {hostel.reviews} reviews</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:4,fontSize:13}}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {hostel.city}, Algeria
+                </div>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:10}}>
+              {[
+                {icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>, label:"Share"},
+                {icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>, label:"Save"},
+              ].map(btn=>(
+                <button key={btn.label} style={{display:"flex",alignItems:"center",gap:6,padding:"9px 16px",border:"1px solid #e0e0e0",borderRadius:8,background:"#fff",cursor:"pointer",fontSize:13,fontWeight:600,color:"#222",fontFamily:"inherit",transition:"background 0.15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.background="#f7f7f7"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                  {btn.icon}{btn.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Gallery */}
+        <div style={{marginBottom:32}}><Gallery hostel={hostel}/></div>
+
+        {/* Two-column layout */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 360px",gap:48,alignItems:"flex-start"}}>
+          {/* LEFT */}
+          <div>
+            {/* Tab bar */}
+            <div style={{position:"sticky",top:64,zIndex:100,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(8px)",marginBottom:28,borderBottom:"1px solid #f0f0f0",marginLeft:-24,paddingLeft:24,marginRight:-24,paddingRight:24}}>
+              <div style={{display:"flex",gap:0,overflowX:"auto",scrollbarWidth:"none"}}>
+                {TABS.map(t=>(
+                  <button key={t.id} onClick={()=>setTab(t.id)} style={{padding:"14px 16px",border:"none",background:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:600,whiteSpace:"nowrap",color:tab===t.id?"#222":"#6a6a6a",borderBottom:tab===t.id?"2px solid #222":"2px solid transparent",transition:"color 0.15s"}}>{t.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Overview */}
+            {tab==="overview" && (
+              <div className="fade-in">
+                <p style={{fontSize:16,lineHeight:1.78,color:"#444",marginBottom:24,textWrap:"pretty"}}>{hostel.desc}</p>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:32}}>
+                  {hostel.highlights.map((h,i)=>(
+                    <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:16,border:"1px solid #f0f0f0",borderRadius:14,background:"#fafafa"}}>
+                      <div style={{width:30,height:30,borderRadius:8,background:"#fff0f2",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span style={{fontSize:14,color:"#333",fontWeight:500,lineHeight:1.45}}>{h}</span>
+                    </div>
+                  ))}
+                </div>
+                <h3 style={{fontSize:20,fontWeight:700,color:"#222",marginBottom:14,letterSpacing:"-0.3px"}}>What's included</h3>
+                <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:24}}>
+                  {hostel.amenities.slice(0,8).map(a=>(
+                    <div key={a.label} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 14px",background:"#f7f7f7",borderRadius:32,fontSize:13,fontWeight:500,color:"#222"}}>
+                      <span>{a.icon}</span>{a.label}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>setTab("amenities")} style={{background:"transparent",border:"1px solid #e0e0e0",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:600,color:"#222",cursor:"pointer",fontFamily:"inherit",marginBottom:36,transition:"background 0.15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.background="#f2f2f2"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  Show all {hostel.amenities.length} amenities
+                </button>
+                <h3 style={{fontSize:20,fontWeight:700,color:"#222",marginBottom:6,letterSpacing:"-0.3px"}}>Guest reviews</h3>
+                <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:20}}>
+                  <div style={{fontSize:52,fontWeight:800,color:"#222",letterSpacing:"-2px"}}>{hostel.rating}</div>
+                  <div><StarRow rating={hostel.rating} size={18}/><div style={{fontSize:13,color:"#6a6a6a",marginTop:6}}>{hostel.reviews} reviews</div></div>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}}>
+                  {hostel.reviews_list.slice(0,2).map((r,i)=>(
+                    <div key={i} style={{padding:16,border:"1px solid #f0f0f0",borderRadius:14,background:"#fafafa"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                        <div style={{width:36,height:36,borderRadius:"50%",background:`hsl(${i*70+190},45%,65%)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff"}}>{r.name[0]}</div>
+                        <div><div style={{fontWeight:600,fontSize:13,color:"#222"}}>{r.name} {r.country}</div><div style={{fontSize:11,color:"#6a6a6a"}}>{r.date}</div></div>
+                      </div>
+                      <StarRow rating={r.rating} size={11}/>
+                      <p style={{fontSize:13,color:"#444",lineHeight:1.55,marginTop:8,textWrap:"pretty"}}>{r.text}</p>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={()=>setTab("reviews")} style={{background:"transparent",border:"1px solid #e0e0e0",borderRadius:8,padding:"10px 20px",fontSize:14,fontWeight:600,color:"#222",cursor:"pointer",fontFamily:"inherit",marginBottom:36,transition:"background 0.15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.background="#f2f2f2"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  Show all {hostel.reviews} reviews
+                </button>
+                <h3 style={{fontSize:20,fontWeight:700,color:"#222",marginBottom:16,letterSpacing:"-0.3px"}}>Location</h3>
+                <MapPlaceholder hostel={hostel}/>
+              </div>
+            )}
+
+            {/* Rooms */}
+            {tab==="rooms" && (
+              <div className="fade-in">
+                <h2 style={{fontSize:22,fontWeight:700,color:"#222",marginBottom:20}}>Available Rooms</h2>
+                {hostel.rooms.map(r=>(
+                  <div key={r.id} style={{border:"1px solid #e8e8e8",borderRadius:16,padding:22,marginBottom:16,transition:"box-shadow 0.2s"}}
+                    onMouseEnter={e=>e.currentTarget.style.boxShadow="rgba(0,0,0,0.07) 0px 4px 16px"}
+                    onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+                    <div style={{display:"flex",gap:16,alignItems:"flex-start"}}>
+                      <div style={{width:96,height:80,borderRadius:10,background:hostel.gradients[0],flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,opacity:0.75}}>{hostel.tag}</div>
+                      <div style={{flex:1}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}}>
+                          <div>
+                            <h3 style={{fontSize:17,fontWeight:700,color:"#222",marginBottom:4}}>{r.name}</h3>
+                            <div style={{fontSize:13,color:"#6a6a6a",marginBottom:8}}>Up to {r.capacity} guests · {r.available} remaining</div>
+                            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                              {r.perks.map(p=><span key={p} style={{fontSize:12,color:"#6a6a6a",background:"#f2f2f2",padding:"3px 10px",borderRadius:99}}>{p}</span>)}
+                            </div>
+                          </div>
+                          <div style={{textAlign:"right"}}>
+                            <div style={{fontSize:22,fontWeight:800,color:"#222"}}>{r.price.toLocaleString()} <span style={{fontSize:14,fontWeight:400,color:"#6a6a6a"}}>DA/night</span></div>
+                          </div>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:12,marginTop:16}}>
+                          <button style={{background:ACCENT,color:"#fff",border:"none",borderRadius:8,padding:"10px 22px",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"background 0.15s"}}
+                            onMouseEnter={e=>e.currentTarget.style.background="#e00b41"} onMouseLeave={e=>e.currentTarget.style.background=ACCENT}>
+                            Book this room
+                          </button>
+                          <span style={{fontSize:12,color:"#22c55e",fontWeight:600,display:"flex",alignItems:"center",gap:4}}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>Free cancellation
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Amenities */}
+            {tab==="amenities" && (
+              <div className="fade-in">
+                <h2 style={{fontSize:22,fontWeight:700,color:"#222",marginBottom:20}}>All Amenities</h2>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                  {hostel.amenities.map(a=>(
+                    <div key={a.label} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",border:"1px solid #f0f0f0",borderRadius:12}}>
+                      <span style={{fontSize:22}}>{a.icon}</span>
+                      <span style={{fontSize:14,fontWeight:500,color:"#222"}}>{a.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Reviews */}
+            {tab==="reviews" && (
+              <div className="fade-in">
+                <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:28}}>
+                  <div style={{fontSize:56,fontWeight:800,color:"#222",letterSpacing:"-2px"}}>{hostel.rating}</div>
+                  <div>
+                    <StarRow rating={hostel.rating} size={20}/>
+                    <div style={{fontSize:15,fontWeight:600,color:"#222",marginTop:6}}>Exceptional</div>
+                    <div style={{fontSize:13,color:"#6a6a6a"}}>{hostel.reviews} verified reviews</div>
+                  </div>
+                </div>
+                {hostel.reviews_list.map((r,i)=>(
+                  <div key={i} style={{borderBottom:"1px solid #f0f0f0",paddingBottom:20,marginBottom:20}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+                      <div style={{width:44,height:44,borderRadius:"50%",background:`hsl(${i*80+160},45%,65%)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,color:"#fff"}}>{r.name[0]}</div>
+                      <div><div style={{fontWeight:600,fontSize:15,color:"#222"}}>{r.name} {r.country}</div><div style={{fontSize:12,color:"#6a6a6a"}}>{r.date}</div></div>
+                    </div>
+                    <StarRow rating={r.rating} size={13}/>
+                    <p style={{fontSize:15,color:"#333",lineHeight:1.65,marginTop:10,textWrap:"pretty"}}>{r.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Location */}
+            {tab==="location" && (
+              <div className="fade-in">
+                <h2 style={{fontSize:22,fontWeight:700,color:"#222",marginBottom:8}}>Location</h2>
+                <p style={{fontSize:14,color:"#6a6a6a",marginBottom:20}}>{hostel.address}</p>
+                <MapPlaceholder hostel={hostel}/>
+                <div style={{marginTop:20,padding:16,background:"#f7f7f7",borderRadius:12}}>
+                  <div style={{fontWeight:700,fontSize:14,color:"#222",marginBottom:8}}>Getting there</div>
+                  <div style={{fontSize:13,color:"#6a6a6a",lineHeight:1.7}}>Wilaya: {hostel.wilaya}<br/>Coordinates: {hostel.lat.toFixed(4)}°N, {Math.abs(hostel.lng).toFixed(4)}°{hostel.lng<0?"W":"E"}<br/>For detailed directions, contact the hostel directly.</div>
+                </div>
+              </div>
+            )}
+
+            {/* Policies */}
+            {tab==="policies" && (
+              <div className="fade-in">
+                <h2 style={{fontSize:22,fontWeight:700,color:"#222",marginBottom:20}}>House Rules & Policies</h2>
+                <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                  {hostel.policies.map((p,i)=>(
+                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",border:"1px solid #f0f0f0",borderRadius:12}}>
+                      <div style={{width:30,height:30,borderRadius:"50%",background:"#f7f7f7",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span style={{fontSize:14,color:"#333",fontWeight:500}}>{p}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT: booking panel */}
+          <div style={{position:"sticky",top:80}}>
+            <BookingPanel hostel={hostel}/>
+            {/* More hostels */}
+            <div style={{marginTop:20,padding:20,border:"1px solid #f0f0f0",borderRadius:20}}>
+              <div style={{fontSize:13,fontWeight:700,color:"#222",marginBottom:14}}>You might also like</div>
+              {others.map(h=>(
+                <a key={h.id} href={`Hostel Detail.html?id=${h.id}`} style={{display:"flex",gap:10,marginBottom:12,textDecoration:"none",color:"inherit",transition:"opacity 0.15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.opacity="0.75"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+                  <div style={{width:54,height:54,borderRadius:10,background:h.gradients[0],flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,opacity:0.8}}>{h.tag}</div>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:13,color:"#222",lineHeight:1.3}}>{h.name}</div>
+                    <div style={{fontSize:12,color:"#6a6a6a",marginTop:2}}>{h.city} · {h.price.toLocaleString()} DA/night</div>
+                    <div style={{display:"flex",alignItems:"center",gap:3,marginTop:3}}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#222"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <span style={{fontSize:12,fontWeight:600,color:"#222"}}>{h.rating}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+              <a href="Landing Page.html" style={{display:"block",textAlign:"center",fontSize:13,fontWeight:600,color:ACCENT,textDecoration:"none",marginTop:12,padding:"9px",borderRadius:8,border:`1px solid ${ACCENT}30`,background:"#fff8f9",transition:"background 0.15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background="#fff0f2"} onMouseLeave={e=>e.currentTarget.style.background="#fff8f9"}>
+                Browse all hostels →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer style={{borderTop:"1px solid #e8e8e8",padding:"28px 24px",background:"#fafafa"}}>
+        <div style={{maxWidth:1280,margin:"0 auto",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
+          <div style={{fontSize:13,color:"#6a6a6a"}}>© 2026 Sahil Bay Hostel · Algeria's Hostel Network</div>
+          <div style={{display:"flex",gap:20}}>
+            {["Privacy","Terms","Help","Contact"].map(l=>(
+              <span key={l} style={{fontSize:13,color:"#6a6a6a",cursor:"pointer",transition:"color 0.15s"}}
+                onMouseEnter={e=>e.currentTarget.style.color="#222"} onMouseLeave={e=>e.currentTarget.style.color="#6a6a6a"}>{l}</span>
+            ))}
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="80" fill="#fff"/>
+    <rect x="0" y="0" width="120" height="12" fill="#fff" stroke="#eee" stroke-width="0.5"/>
+    <rect x="4" y="3" width="16" height="6" rx="2" fill="#ff385c" opacity="0.7"/>
+    <rect x="4" y="16" width="70" height="30" rx="4" fill="#c79081" opacity="0.5"/>
+    <rect x="76" y="16" width="40" height="14" rx="3" fill="#e8b49a" opacity="0.4"/>
+    <rect x="76" y="32" width="40" height="14" rx="3" fill="#d4956a" opacity="0.4"/>
+    <rect x="4" y="50" width="68" height="8" rx="2" fill="#f0f0f0"/>
+    <rect x="4" y="62" width="68" height="14" rx="4" fill="#f7f7f7" stroke="#e0e0e0" stroke-width="0.5"/>
+    <rect x="76" y="50" width="40" height="26" rx="4" fill="#ff385c" opacity="0.08" stroke="#ff385c" stroke-width="0.5"/>
+    <rect x="80" y="62" width="32" height="8" rx="4" fill="#ff385c" opacity="0.7"/>
+  </svg>
+</template>
+</body>
+</html>
